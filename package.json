@@ -1,0 +1,47 @@
+{
+  "name": "@universal-ui/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Framework-neutral, accessible desktop UI primitives with restrained motion.",
+  "type": "module",
+  "types": "./packages/vanilla/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./packages/vanilla/index.d.ts",
+      "default": "./packages/vanilla/index.js"
+    },
+    "./vanilla": {
+      "types": "./packages/vanilla/index.d.ts",
+      "default": "./packages/vanilla/index.js"
+    },
+    "./core.css": "./packages/core/index.css",
+    "./tokens.css": "./packages/core/tokens.css",
+    "./motion.css": "./packages/core/motion.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "packages",
+    "docs",
+    "skills",
+    "skills.sh.json",
+    "README.md",
+    "README.en.md",
+    "NOTICE.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "showcase": "node ./apps/showcase/server.mjs",
+    "test": "node --test ./tests/*.test.mjs",
+    "audit": "node ./tests/audit.mjs",
+    "browser": "node ./tests/browser-check.mjs",
+    "typecheck": "tsc --noEmit",
+    "check": "npm test && npm run audit && npm run typecheck && npm run browser"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

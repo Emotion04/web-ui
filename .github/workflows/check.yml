@@ -1,0 +1,28 @@
+name: check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      # The browser pass drives real Chromium over CDP; the runner has none by
+      # default, so install one and point CHROME_PATH at it. Playwright is used
+      # only as a Chromium download — the kit itself has no Playwright code.
+      - name: Install Chromium
+        run: npx --yes playwright@latest install --with-deps chromium
+
+      - name: Resolve CHROME_PATH
+        run: echo "CHROME_PATH=$(find ~/.cache/ms-playwright -type f -name chrome | head -n 1)" >> "$GITHUB_ENV"
+
+      - run: npm run check

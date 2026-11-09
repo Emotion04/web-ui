@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Universal UI Showcase</title>
+  <!-- The showcase has no icon; this stops the browser's automatic /favicon.ico
+       request from showing up as a console error during checks. -->
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/core/index.css">
+  <style>
+    .showcase-tools { display: flex; flex-wrap: wrap; gap: 8px; }
+    .showcase-stack { display: grid; gap: 12px; }
+    .showcase-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: end; }
+    .showcase-code { padding: 12px; border-radius: var(--ui-radius-sm); background: var(--ui-surface-muted); color: var(--ui-fg-secondary); font: 12px/1.6 var(--ui-code-font); overflow: auto; margin: 0; }
+    .showcase-swatch { display: flex; align-items: center; gap: 10px; }
+    .showcase-swatch i { display: block; width: 28px; height: 28px; border: 1px solid var(--ui-line); border-radius: 7px; background: var(--swatch); }
+    .showcase-status { min-height: 22px; color: var(--ui-fg-muted); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="ui-shell">
+    <aside class="ui-sidebar" aria-label="Showcase navigation">
+      <div class="ui-sidebar__brand">Universal UI</div>
+      <nav class="ui-sidebar__nav" id="sideNav">
+        <div class="ui-sidebar__section">Explore</div>
+        <button type="button" class="ui-nav-item" data-view="foundations" aria-current="page">Foundations</button>
+        <button type="button" class="ui-nav-item" data-view="components">Components</button>
+        <div class="ui-subnav" id="componentSubnav" hidden>
+          <button type="button" class="ui-subnav__item" data-subtab="ctab-controls" aria-current="page">Controls</button>
+          <button type="button" class="ui-subnav__item" data-subtab="ctab-forms">Forms</button>
+          <button type="button" class="ui-subnav__item" data-subtab="ctab-overlays">Overlays</button>
+          <button type="button" class="ui-subnav__item" data-subtab="ctab-composition">Composition</button>
+        </div>
+        <button type="button" class="ui-nav-item" data-view="behavior">Behavior</button>
+        <div class="ui-sidebar__section">Surfaces</div>
+        <button type="button" class="ui-nav-item" data-view="panel">Tray panel</button>
+        <button type="button" class="ui-nav-item" data-view="states">State matrix</button>
+        <button type="button" class="ui-nav-item" data-view="motion">Motion</button>
+      </nav>
+    </aside>
+
+    <header class="ui-topbar">
+      <button type="button" class="ui-icon-button" id="navTrigger" aria-haspopup="dialog" aria-controls="navSheet" aria-label="Open navigation"><svg class="ui-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg></button>
+      <span class="ui-topbar__brand">Universal UI</span>
+    </header>
+
+    <main class="ui-main">
+      <header class="ui-page-header">
+        <div><h1 id="pageTitle">Foundations</h1><p id="pageSubtitle">Tokens are the public visual contract.</p></div>
+        <div class="showcase-tools">
+          <button type="button" class="ui-button" id="themeButton">Toggle theme</button>
+          <button type="button" class="ui-button ui-button--primary" id="toastButton">Show toast</button>
+        </div>
+      </header>
+      <div class="ui-toolbar"><span class="showcase-status" id="status" role="status">All examples are interactive.</span><div class="ui-cluster"><div class="ui-segmented" id="navMode" role="group" aria-label="Navigation mode"><button type="button" class="ui-segmented__item" aria-pressed="true" data-value="tabs">Tabs</button><button type="button" class="ui-segmented__item" aria-pressed="false" data-value="scroll">Scroll</button></div><button type="button" class="ui-icon-button" id="dialogButton" aria-label="Open dialog">+</button></div></div>
+
+      <!-- ── Foundations ─────────────────────────────────────────────── -->
+      <section class="ui-view" id="view-foundations" data-view="foundations">
+        <div class="ui-grid">
+          <article class="ui-card">
+            <div class="ui-card__header"><h2>Tokens</h2><p>Light and dark resolve to the same variable names.</p></div>
+            <div class="ui-card__body showcase-stack">
+              <div class="showcase-swatch"><i style="--swatch: var(--ui-bg)"></i><span>Background</span></div>
+              <div class="showcase-swatch"><i style="--swatch: var(--ui-surface)"></i><span>Surface</span></div>
+              <div class="showcase-swatch"><i style="--swatch: var(--ui-accent)"></i><span>Accent</span></div>
+              <div class="showcase-swatch"><i style="--swatch: var(--ui-success)"></i><span>Success</span></div>
+              <div class="showcase-swatch"><i style="--swatch: var(--ui-danger)"></i><span>Danger</span></div>
+            </div>
+          </article>
+          <article class="ui-card">
+            <div class="ui-card__header"><h2>Layout primitives</h2><p>Stack, cluster and grid compose every page.</p></div>
+            <div class="ui-card__body showcase-stack">
+              <div class="ui-cluster"><span class="ui-badge">cluster</span><span class="ui-badge">wraps</span><span class="ui-badge">items</span></div>
+              <div class="ui-stack ui-stack--tight"><div class="ui-skeleton ui-skeleton--text" style="width:70%"></div><div class="ui-skeleton ui-skeleton--text" style="width:45%"></div></div>
+              <p class="ui-help">Grid, stack and cluster are the only layout primitives an app needs.</p>
+              <div class="ui-stack ui-stack--tight">
+                <span class="ui-help ui-text-start">text-start</span>
+                <span class="ui-help ui-text-center">text-center</span>
+                <span class="ui-help ui-text-end">text-end</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Components ──────────────────────────────────────────────── -->
+      <section class="ui-view" id="view-components" data-view="components" hidden>
+        <nav class="ui-section-nav" id="componentSections" aria-label="Component sections" hidden>
+          <button type="button" class="ui-section-nav__item" data-section-target="cpanel-controls">Controls</button>
+          <button type="button" class="ui-section-nav__item" data-section-target="cpanel-forms">Forms</button>
+          <button type="button" class="ui-section-nav__item" data-section-target="cpanel-overlays">Overlays</button>
+          <button type="button" class="ui-section-nav__item" data-section-target="cpanel-composition">Composition</button>
+        </nav>
+        <div class="ui-tabs" id="componentTabs" role="tablist" aria-label="Component groups">
+          <button type="button" class="ui-tab" role="tab" id="ctab-controls" aria-controls="cpanel-controls" aria-selected="true">Controls</button>
+          <button type="button" class="ui-tab" role="tab" id="ctab-forms" aria-controls="cpanel-forms" aria-selected="false">Forms</button>
+          <button type="button" class="ui-tab" role="tab" id="ctab-overlays" aria-controls="cpanel-overlays" aria-selected="false">Overlays</button>
+          <button type="button" class="ui-tab" role="tab" id="ctab-composition" aria-controls="cpanel-composition" aria-selected="false">Composition</button>
+        </div>
+
+        <div class="ui-tabpanel" id="cpanel-controls" role="tabpanel" aria-labelledby="ctab-controls">
+          <div class="ui-grid">
+            <article class="ui-card">
+              <div class="ui-card__header"><h2>Buttons</h2><p>Default, primary, danger, disabled.</p></div>
+              <div class="ui-card__body showcase-stack">
+                <div class="showcase-actions"><button type="button" class="ui-button">Default</button><button type="button" class="ui-button ui-button--primary">Primary</button><button type="button" class="ui-button ui-button--danger">Danger</button><button type="button" class="ui-button" disabled>Disabled</button></div>
+                <div class="showcase-actions"><button type="button" class="ui-icon-button" aria-label="Icon action">+</button><button type="button" class="ui-icon-button" aria-label="Icon action">×</button></div>
+                <div class="showcase-actions"><button type="button" class="ui-button ui-button--sm">Small</button><button type="button" class="ui-button ui-button--lg">Large</button><button type="button" class="ui-button ui-button--loading">Saving</button><button type="button" class="ui-button ui-button--primary ui-button--loading">Saving</button></div>
+                <div class="showcase-actions"><button type="button" class="ui-button"><svg class="ui-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>With icon</button><button type="button" class="ui-button"><svg class="ui-icon ui-icon--sm" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>Small icon</button><button type="button" class="ui-button"><svg class="ui-icon ui-icon--lg" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>Large icon</button></div>
+                <div class="ui-field"><label for="smInput">Small input</label><input class="ui-input ui-input--sm" id="smInput" placeholder="Compact"></div>
+                <p class="ui-help ui-truncate" style="max-width:220px">This single line is truncated with an ellipsis instead of wrapping.</p>
+                <p class="ui-help ui-clamp-2" style="max-width:220px">This paragraph clamps to two lines and then stops, which is what a fixed-height row needs so the title cannot push the metadata down.</p>
+                <p class="ui-help">Read the <a class="ui-link" href="#foundations">foundations page</a> for tokens.</p>
+              </div>
+            </article>
+            <article class="ui-card">
+              <div class="ui-card__header"><h2>Text input, switch, segmented</h2><p>Compact targets with a visible focus ring.</p></div>
+              <div class="ui-card__body showcase-stack">
+                <div class="ui-field"><label for="sample-input">Label</label><input class="ui-input" id="sample-input" placeholder="Focus me"></div>
+                <div class="ui-segmented" role="group" aria-label="Example mode"><button type="button" class="ui-segmented__item" aria-pressed="true" data-value="one">One</button><button type="button" class="ui-segmented__item" aria-pressed="false" data-value="two">Two</button><button type="button" class="ui-segmented__item" aria-pressed="false" data-value="three">Three</button></div>
+                <div class="ui-row"><div class="ui-row__copy"><div class="ui-row__title">Notifications</div><div class="ui-row__subtitle">A reusable settings row</div></div><button type="button" class="ui-switch" role="switch" aria-checked="false" aria-label="Notifications"></button></div>
+              </div>
+            </article>
+            <article class="ui-card">
+              <div class="ui-card__header"><h2>Checkbox group</h2><p>Select all reflects partial selection as mixed.</p></div>
+              <div class="ui-card__body">
+                <div class="ui-stack ui-stack--tight" id="checkGroup">
+                  <label class="ui-check"><input type="checkbox" id="checkAll"><span>Select all</span></label>
+                  <label class="ui-check"><input type="checkbox" class="check-item" checked><span>Sessions</span></label>
+                  <label class="ui-check"><input type="checkbox" class="check-item"><span>Library</span></label>
+                  <label class="ui-check"><input type="checkbox" class="check-item"><span>Routing</span></label>
+                  <label class="ui-check"><input type="checkbox" class="check-item" disabled><span>Locked item</span></label>
+                </div>
+              </div>
+            </article>
+            <article class="ui-card">
+              <div class="ui-card__header"><h2>Tabs</h2><p>Arrow keys move and select; disabled tabs are skipped.</p></div>
+              <div class="ui-card__body">
+                <div class="ui-tabs" id="demoTabs" role="tablist" aria-label="Example tabs">
+                  <button type="button" class="ui-tab" role="tab" id="tab-a" aria-controls="panel-a" aria-selected="true">Overview</button>
+                  <button type="button" class="ui-tab" role="tab" id="tab-b" aria-controls="panel-b" aria-selected="false">Details</button>
+                  <button type="button" class="ui-tab" role="tab" id="tab-c" aria-controls="panel-c" aria-selected="false" disabled>Disabled</button>
+                </div>
+                <div class="ui-tabpanel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">First panel. Arrow keys move and select at once.</div>
+                <div class="ui-tabpanel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>Second panel. Disabled tabs are skipped.</div>
+                <div class="ui-tabpanel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>Third panel.</div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="ui-tabpanel" id="cpanel-forms" role="tabpanel" aria-labelledby="ctab-forms" hidden>
+          <div class="ui-grid">
+            <article class="ui-card">
+              <div class="ui-card__header"><h2>Form controls</h2><p>Textarea, select and radio share one border and focus ring.</p></div>
+              <div class="ui-card__body showcase-stack">
+                <div class="ui-field"><label for="demoSelect">Select</label><select class="ui-select" id="demoSelect"><option>Option one</option><option>Option two</option><option disabled>Disabled option</option></select></div>
+                <div class="ui-field"><label for="demoTextarea">Notes</label><textarea class="ui-textarea" id="demoTextarea" placeholder="Resizable, same border language"></textarea></div>
+                <fieldset class="ui-radio-group" id="demoRadios"><legend>Density</legend><label class="ui-radio"><input type="radio" name="density" value="comfortable" checked><span>Comfortable</span></label><label class="ui-radio"><input type="radio" name="density" value="compact"><span>Compact</span></label><label class="ui-radio"><input type="radio" name="density" value="locked" disabled><span>Locked</span></label></fieldset>
+              </div>
+            </article>
+            <article class="ui-card">
+              <div class="ui-card__header"><h2>Slider</h2><p>Native range keeps keyboard and value announcement.</p></div>
+              <div class="ui-card__body showcase-stack">
+                <div class="ui-slider"><label for="demoSlider">Sample value</label><input type="range" id="demoSlider" min="0" max="100" value="40"><span class="ui-slider__value" id="sliderValue">40</span></div>
+              </div>
+            </article>
+            <article class="ui-card">
+              <div class="ui-card__header"><h2>Chips, avatars, copy</h2><p>Small identity and action affordances.</p></div>
+              <div class="ui-card__body showcase-stack">
+                <div class="showcase-actions" style="justify-content:start"><button type="button" class="ui-chip ui-chip--action" aria-pressed="true">Active chip</button><button type="button" class="ui-chip ui-chip--action" aria-pressed="false">Toggle chip</button><span class="ui-chip">Static chip</span></div>
+                <div class="ui-cluster"><span class="ui-avatar">AB</span><span class="ui-avatar ui-avatar--sm">CD</span><span class="ui-avatar ui-avatar--lg">EF</span><button type="button" class="ui-button ui-copy" id="copyButton" data-copy="npm install @universal-ui/core"><span>Copy install</span><span class="ui-copy__done" aria-live="polite">Copied</span></button></div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="ui-tabpanel" id="cpanel-overlays" role="tabpanel" aria-labelledby="ctab-overlays" hidden>
+          <div class="ui-grid">
+            <article class="ui-card">
+              <div class="ui-card__header"><h2>Menu</h2><p>Checkbox and radio items, as system menus use.</p></div>
+              <div class="ui-card__body">
+                <div class="ui-menu" id="demoMenu" aria-label="Example menu">
+                  <div class="ui-menu__group">View</div>
+                  <button type="button" class="ui-menu__item" role="menuitem"><span class="ui-menu__check" aria-hidden="true"></span><span class="ui-menu__label">Open</span><span class="ui-menu__hint">Ctrl+O</span></button>
+                  <button type="button" class="ui-menu__item" role="menuitemcheckbox" aria-checked="true"><span class="ui-menu__check" aria-hidden="true">✓</span><span class="ui-menu__label">Show sidebar</span></button>
+                  <button type="button" class="ui-menu__item" role="menuitemradio" aria-checked="true"><span class="ui-menu__check" aria-hidden="true">✓</span><span class="ui-menu__label">Compact density</span></button>
+                  <button type="button" class="ui-menu__item" role="menuitemradio" aria-checked="false"><span class="ui-menu__check" aria-hidden="true">✓</span><span class="ui-menu__label">Comfortable density</span></button>
+                  <div class="ui-menu__sep" role="separator"></div>
+                  <button type="button" class="ui-menu__item" role="menuitem" aria-disabled="true"><span class="ui-menu__check" aria-hidden="true"></span><span class="ui-menu__label">Unavailable</span></button>
+                </div>
+              </div>
+            </article>
+            <article class="ui-card">
+              <div class="ui-card__header"><h2>Disclosure and command list</h2><p>Filtering clamps the highlight so Enter never selects a hidden row.</p></div>
+              <div class="ui-card__body showcase-stack">
+                <div id="demoDisclosure"><div class="ui-disclosure"><button type="button" class="ui-disclosure__trigger" data-ui-disclosure-trigger aria-expanded="false" id="disc-1"><span>Advanced options</span><span class="ui-disclosure__mark" aria-hidden="true">›</span></button><div class="ui-disclosure__content" data-ui-disclosure-content id="disc-panel-1" hidden>Content revealed by the disclosure trigger.</div></div></div>
+                <div class="ui-command"><input class="ui-input" id="commandInput" type="search" placeholder="Filter commands" autocomplete="off" spellcheck="false" aria-label="Filter commands"><div class="ui-command__list" id="commandList" role="listbox" aria-label="Commands"><button type="button" class="ui-command__item" role="option" data-value="new">New item<span class="ui-command__hint">Enter</span></button><button type="button" class="ui-command__item" role="option" data-value="open">Open item<span class="ui-command__hint">Ctrl+O</span></button><button type="button" class="ui-command__item" role="option" data-value="close">Close item<span class="ui-command__hint">Esc</span></button><button type="button" class="ui-command__item" role="option" data-value="delete">Delete item<span class="ui-command__hint">Del</span></button></div><p class="ui-help" id="commandEmpty" hidden>No matching commands.</p></div>
+              </div>
+            </article>
+            <article class="ui-card">
+              <div class="ui-card__header"><h2>Popover and sheet</h2><p>Both dismiss on Escape and outside pointer.</p></div>
+              <div class="ui-card__body showcase-stack">
+                <div class="showcase-actions" style="justify-content:start"><button type="button" class="ui-button" id="popoverButton" aria-expanded="false">Open popover</button><button type="button" class="ui-button" id="sheetButton">Open sheet</button></div>
+                <div class="showcase-code">Popover returns focus to its trigger; the sheet is a modal dialog.</div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="ui-tabpanel" id="cpanel-composition" role="tabpanel" aria-labelledby="ctab-composition" hidden>
+          <div class="ui-grid">
+            <article class="ui-card">
+              <div class="ui-card__header"><h2>Toolbar, breadcrumb, stats</h2><p>Page-level composition.</p></div>
+              <div class="ui-card__body showcase-stack">
+                <nav class="ui-breadcrumb" aria-label="Breadcrumb"><a href="#foundations">Home</a><span class="ui-breadcrumb__sep" aria-hidden="true">/</span><a href="#components">Settings</a><span class="ui-breadcrumb__sep" aria-hidden="true">/</span><span aria-current="page">Appearance</span></nav>
+                <div class="ui-toolbar"><div class="ui-cluster"><button type="button" class="ui-button ui-button--primary">Save</button><button type="button" class="ui-button">Cancel</button></div><div class="ui-cluster"><span class="ui-badge">Draft</span><span class="ui-badge ui-badge--success">Synced</span></div></div>
+                <div class="ui-grid"><div class="ui-stat"><span class="ui-stat__label">Requests</span><span class="ui-stat__value">1,284</span><span class="ui-stat__delta ui-stat__delta--up">+12%</span></div><div class="ui-stat"><span class="ui-stat__label">Errors</span><span class="ui-stat__value">3</span><span class="ui-stat__delta ui-stat__delta--down">−2%</span></div></div>
+                <svg class="ui-sparkline" id="sparkline" role="img" aria-label="Requests over the last 12 intervals"></svg>
+                <hr class="ui-divider">
+                <div class="ui-grid">
+                  <button type="button" class="ui-tile" aria-selected="true"><span class="ui-tile__title">Tile one</span><span class="ui-tile__meta">Selectable card</span></button>
+                  <button type="button" class="ui-tile"><span class="ui-tile__title">Tile two</span><span class="ui-tile__meta">Hover raises the border</span></button>
+                </div>
+                <div class="ui-card__footer ui-cluster"><span class="ui-muted">Footer actions sit here.</span></div>
+              </div>
+            </article>
+            <article class="ui-card">
+              <div class="ui-card__header"><h2>Resize, reorder, arm</h2><p>Pointer and keyboard both work; nothing destructive fires on one click.</p></div>
+              <div class="ui-card__body showcase-stack">
+                <div style="display:flex;height:110px;overflow:hidden;border:1px solid var(--ui-line);border-radius:var(--ui-radius-md)">
+                  <div id="resizeTarget" style="width:180px;background:var(--ui-surface-muted);padding:10px;font-size:12px;color:var(--ui-fg-muted)">Resizable pane</div>
+                  <div class="ui-resizer" id="resizer" tabindex="0" aria-label="Resize pane"></div>
+                  <div style="flex:1;padding:10px;font-size:12px;color:var(--ui-fg-muted)">Content stays put</div>
+                </div>
+                <div class="ui-stack ui-stack--tight ui-scroll" id="dragList" style="max-height:150px">
+                  <div class="ui-row ui-drag" data-drag-item="alpha"><span class="ui-drag__handle" data-drag-handle aria-hidden="true">⠿</span><span class="ui-row__title">Alpha</span></div>
+                  <div class="ui-row ui-drag" data-drag-item="beta"><span class="ui-drag__handle" data-drag-handle aria-hidden="true">⠿</span><span class="ui-row__title">Beta</span></div>
+                  <div class="ui-row ui-drag" data-drag-item="gamma"><span class="ui-drag__handle" data-drag-handle aria-hidden="true">⠿</span><span class="ui-row__title">Gamma</span></div>
+                  <div class="ui-row ui-drag" data-drag-item="delta"><span class="ui-drag__handle" data-drag-handle aria-hidden="true">⠿</span><span class="ui-row__title">Delta</span></div>
+                </div>
+                <div class="showcase-actions" style="justify-content:start"><button type="button" class="ui-button ui-arm" id="armButton"><span data-arm-label>Delete permanently</span></button><button type="button" class="ui-button" id="stackToastButton">Stack toasts</button></div>
+                <span class="ui-sr-only">This text is available to screen readers only.</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Behavior ────────────────────────────────────────────────── -->
+      <section class="ui-view" id="view-behavior" data-view="behavior" hidden>
+        <div class="ui-grid">
+          <article class="ui-card">
+            <div class="ui-card__header"><h2>Dialogs</h2><p>Focus moves in, Tab cycles, Escape closes, focus returns.</p></div>
+            <div class="ui-card__body showcase-stack">
+              <div class="showcase-actions" style="justify-content:start"><button type="button" class="ui-button" id="dialogTrigger">Open dialog</button><button type="button" class="ui-button" id="confirmButton" data-variant="danger">Destructive action</button></div>
+              <div class="showcase-code">The destructive dialog starts on Cancel, so Enter cancels rather than deletes.</div>
+            </div>
+          </article>
+          <article class="ui-card">
+            <div class="ui-card__header"><h2>Tooltip</h2><p>Appears on hover or focus, dismisses on Escape.</p></div>
+            <div class="ui-card__body"><button type="button" class="ui-button" id="tooltipTarget">Hover or focus me</button></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Tray panel ──────────────────────────────────────────────── -->
+      <section class="ui-view" id="view-panel" data-view="panel" hidden>
+        <div class="ui-grid">
+          <article class="ui-card">
+            <div class="ui-card__header"><h2>Panel</h2><p>The compact surface an icon opens. Content-sized, no title bar.</p></div>
+            <div class="ui-card__body showcase-stack">
+              <div class="ui-panel">
+                <div class="ui-panel__header"><span class="ui-panel__title">Universal UI</span><span class="ui-badge ui-badge--success">Running</span></div>
+                <div class="ui-panel__body">
+                  <div class="ui-panel__section"><div class="ui-panel__section-label">Status</div><div class="ui-panel__row"><span class="ui-panel__row-label">Requests today</span><span class="ui-panel__value">1,284</span></div><div class="ui-panel__row"><span class="ui-panel__row-label">Errors</span><span class="ui-panel__value">3</span></div></div>
+                  <div class="ui-panel__section"><div class="ui-panel__section-label">Actions</div><div class="ui-panel__row"><span class="ui-panel__row-label">Pause</span><button type="button" class="ui-switch" role="switch" aria-checked="false" aria-label="Pause"></button></div></div>
+                </div>
+                <div class="ui-panel__footer"><button type="button" class="ui-button">Open window</button><button type="button" class="ui-button ui-button--primary">Resume</button></div>
+              </div>
+              <div class="showcase-code">In a desktop shell this is a frameless window anchored under the icon. Left click toggles it; right click is the host's native menu; opening the full window is a separate action.</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── States ──────────────────────────────────────────────────── -->
+      <section class="ui-view" id="view-states" data-view="states" hidden>
+        <div class="ui-grid">
+          <article class="ui-card">
+            <div class="ui-card__header"><h2>Status and progress</h2><p>Loading, success, warning and error stay readable.</p></div>
+            <div class="ui-card__body showcase-stack">
+              <div class="ui-cluster"><span class="ui-badge ui-badge--success">Ready</span><span class="ui-badge">Loading</span><span class="ui-badge ui-badge--warning">Degraded</span><span class="ui-badge ui-badge--danger">Needs attention</span><span class="ui-badge ui-badge--accent">New</span></div>
+              <div class="ui-meter"><div class="ui-meter__track"><div class="ui-meter__bar" style="width:64%"></div></div><span class="ui-help">64% used</span></div>
+              <div class="ui-meter"><div class="ui-meter__track"><div class="ui-meter__bar ui-meter__bar--danger" style="width:92%"></div></div><span class="ui-help">92% used</span></div>
+              <div class="ui-meter"><div class="ui-meter__track"><div class="ui-meter__bar ui-meter__bar--success" style="width:24%"></div></div><span class="ui-help">24% used</span></div>
+              <hr class="ui-divider">
+              <div class="ui-cluster"><span class="ui-muted">Muted text</span><span class="ui-divider ui-divider--vertical" aria-hidden="true"></span><span class="ui-help">A vertical divider separates inline groups</span></div>
+              <div class="ui-cluster"><span class="ui-status ui-status--success">Saved</span><span class="ui-status ui-status--warning">Degraded</span><span class="ui-status ui-status--danger">Request failed</span></div>
+              <div class="ui-alert ui-alert--warning" role="status"><span class="ui-alert__body"><span class="ui-alert__title">Imported with warnings</span>Two entries were skipped because their names collided.</span><button type="button" class="ui-alert__close" aria-label="Dismiss alert">×</button></div>
+              <div class="ui-alert ui-alert--success" role="status"><span class="ui-alert__body"><span class="ui-alert__title">Backup written</span>Saved to the previous version slot.</span></div>
+              <div class="ui-alert ui-alert--danger" role="alert"><span class="ui-alert__body"><span class="ui-alert__title">Connection refused</span>The endpoint did not answer within 15 seconds.</span></div>
+              <div class="ui-cluster"><span class="ui-spinner" role="status" aria-label="Loading"></span><span class="ui-ring" style="--ui-ring-value:64" role="img" aria-label="64 percent"><span class="ui-ring__label">64</span></span><span class="ui-ring ui-ring--success" style="--ui-ring-value:100" role="img" aria-label="100 percent"><span class="ui-ring__label">100</span></span><span class="ui-ring ui-ring--danger" style="--ui-ring-value:92" role="img" aria-label="92 percent"><span class="ui-ring__label">92</span></span></div>
+              <div class="ui-field"><label for="errorInput">Email</label><input class="ui-input" id="errorInput" aria-invalid="true" aria-describedby="errorMsg" value="not-an-email"><span class="ui-field__error" id="errorMsg">Enter a valid address.</span></div>
+              <div class="ui-cluster"><span class="ui-kbd">Ctrl</span><span class="ui-kbd">K</span><span class="ui-help">Opens the command list</span></div>
+            </div>
+          </article>
+          <article class="ui-card">
+            <div class="ui-card__header"><h2>Skeleton and empty</h2><p>Placeholders keep their height; empty states explain themselves.</p></div>
+            <div class="ui-card__body showcase-stack">
+              <div class="ui-stack ui-stack--tight"><div class="ui-skeleton ui-skeleton--text" style="width:80%"></div><div class="ui-skeleton ui-skeleton--text" style="width:60%"></div><div class="ui-skeleton ui-skeleton--row"></div></div>
+              <div class="ui-empty"><strong>Nothing here yet</strong><span>Empty states keep their own height.</span></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Motion ──────────────────────────────────────────────────── -->
+      <section class="ui-view" id="view-motion" data-view="motion" hidden>
+        <div class="ui-grid">
+          <article class="ui-card">
+            <div class="ui-card__header"><h2>Motion contract</h2><p>One easing curve, four duration tiers, reduced motion.</p></div>
+            <div class="ui-card__body"><pre class="showcase-code">--ui-ease-standard: cubic-bezier(.2, .8, .2, 1)
+--ui-duration-press:    140ms
+--ui-duration-standard: 160ms
+--ui-duration-panel:    220ms
+--ui-duration-theme:    350ms</pre></div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="ui-dialog" id="dialog" aria-labelledby="dialogTitle" aria-describedby="dialogBody"><div class="ui-dialog__surface"><div class="ui-dialog__header"><h2 id="dialogTitle">Stable dialog behavior</h2><button type="button" class="ui-icon-button" data-ui-close aria-label="Close dialog">×</button></div><div class="ui-dialog__body" id="dialogBody">Focus is trapped while open, Escape closes it, and focus returns to the trigger.</div><div class="ui-dialog__footer"><button type="button" class="ui-button" data-ui-close>Close</button><button type="button" class="ui-button ui-button--primary" data-ui-close>Confirm</button></div></div></dialog>
+  <dialog class="ui-sheet" id="demoSheet" aria-labelledby="sheetTitle" aria-describedby="sheetBody"><div class="ui-sheet__header"><h2 id="sheetTitle">Edge panel</h2><button type="button" class="ui-icon-button" data-ui-sheet-close aria-label="Close panel">×</button></div><div class="ui-sheet__body" id="sheetBody">A modal <code>&lt;dialog&gt;</code> styled as a sheet: focus is trapped and Escape closes it without a key handler.</div><div class="ui-sheet__footer"><button type="button" class="ui-button ui-button--primary" data-ui-sheet-close>Done</button></div></dialog>
+  <dialog class="ui-dialog" id="confirmDialog" role="alertdialog" aria-labelledby="confirmTitle" aria-describedby="confirmBody"><div class="ui-dialog__surface"><div class="ui-dialog__header"><h2 id="confirmTitle">Delete this item?</h2><button type="button" class="ui-icon-button" data-ui-close aria-label="Close dialog">×</button></div><div class="ui-dialog__body" id="confirmBody">This cannot be undone. Focus starts on Cancel so Enter does not destroy anything.</div><div class="ui-dialog__footer"><button type="button" class="ui-button" data-ui-close id="confirmCancel">Cancel</button><button type="button" class="ui-button ui-button--danger" data-ui-close id="confirmDelete">Delete</button></div></div></dialog>
+
+  <!-- The compact-shell counterpart of the sidebar: the topbar's hamburger
+       opens the pages as a left sheet. Sub-navigation stays out — the
+       Components page carries its own in-page tablist at this width. -->
+  <dialog class="ui-sheet" data-side="left" id="navSheet" aria-label="Showcase navigation">
+    <div class="ui-sheet__header"><h2>Universal UI</h2><button type="button" class="ui-icon-button" data-ui-close aria-label="Close navigation">×</button></div>
+    <div class="ui-sheet__body">
+      <nav class="ui-sidebar__nav" aria-label="Showcase pages">
+        <button type="button" class="ui-nav-item" data-view="foundations">Foundations</button>
+        <button type="button" class="ui-nav-item" data-view="components">Components</button>
+        <button type="button" class="ui-nav-item" data-view="behavior">Behavior</button>
+        <button type="button" class="ui-nav-item" data-view="panel">Tray panel</button>
+        <button type="button" class="ui-nav-item" data-view="states">State matrix</button>
+        <button type="button" class="ui-nav-item" data-view="motion">Motion</button>
+      </nav>
+    </div>
+  </dialog>
+  <div class="ui-popover" id="popover" role="menu" tabindex="-1" hidden><button type="button" class="ui-menu-item" role="menuitem">First action</button><button type="button" class="ui-menu-item" role="menuitem">Second action</button></div>
+  <script type="module" src="./showcase.js"></script>
+</body>
+</html>

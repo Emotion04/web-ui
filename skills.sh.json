@@ -1,0 +1,13 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Design Systems",
+      "description": "Build interfaces with the Universal UI design system contract: tokens, ui-* classes and vanilla behaviour binders.",
+      "skills": [
+        "universal-ui"
+      ]
+    }
+  ]
+}
