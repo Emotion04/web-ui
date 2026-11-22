@@ -70,9 +70,11 @@ html, body { overscroll-behavior: none; }
 }
 
 .ui-shell { min-height: 100vh; display: grid; grid-template-columns: 232px minmax(0, 1fr); }
-/* Compact-shell navigation: the hamburger bar that replaces the sidebar below
-   the shell breakpoint. Desktop never renders it. */
-.ui-topbar { display: none; }
+/* The topbar renders wherever the host places it — full-width above .ui-shell
+   for integrated titlebars, sticky in compact shells. Visibility per
+   breakpoint is the host's decision: the kit does not hide it on desktop. */
+.ui-topbar { position: sticky; top: 0; z-index: var(--ui-z-sticky); display: flex; align-items: center; gap: var(--ui-space-5); padding: var(--ui-space-4) var(--ui-space-6); background: var(--ui-bg); background: color-mix(in srgb, var(--ui-bg) 86%, transparent); backdrop-filter: blur(14px); }
+.ui-topbar__brand { color: var(--ui-fg); font-weight: 700; letter-spacing: -.02em; }
 .ui-sidebar { display: flex; flex-direction: column; gap: var(--ui-space-5); padding: var(--ui-space-8) var(--ui-space-6); border-right: 1px solid var(--ui-line); background: var(--ui-surface); }
 .ui-sidebar__brand { padding: var(--ui-space-4) var(--ui-space-5) var(--ui-space-8); color: var(--ui-fg); font-weight: 700; letter-spacing: -.02em; }
 .ui-sidebar__nav { position: relative; display: grid; gap: var(--ui-space-1); }
@@ -556,13 +558,7 @@ html, body { overscroll-behavior: none; }
   .ui-shell { display: block; }
   .ui-sidebar { display: none; }
   /* The sidebar disappears with the grid, so the topbar is the only navigation
-     surface: it stays pinned while the page scrolls and opens the sidebar as a
-     left sheet (see .ui-sheet[data-side="left"]). */
-  /* The compact topbar shares the page background — one surface, no divider —
-     and stays legible over scrolled content through translucency and blur.
-     The plain var(--ui-bg) first keeps engines without color-mix solid. */
-  .ui-topbar { position: sticky; top: 0; z-index: var(--ui-z-sticky); display: flex; align-items: center; gap: var(--ui-space-5); padding: var(--ui-space-4) var(--ui-space-6); background: var(--ui-bg); background: color-mix(in srgb, var(--ui-bg) 86%, transparent); backdrop-filter: blur(14px); }
-  .ui-topbar__brand { color: var(--ui-fg); font-weight: 700; letter-spacing: -.02em; }
+     surface: base styles above keep it pinned while the page scrolls. */
   .ui-main { padding: var(--ui-space-9) var(--ui-space-8); }
   .ui-page-header { align-items: start; flex-direction: column; }
 }

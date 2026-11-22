@@ -3,6 +3,19 @@
 Not published to npm yet. Entries describe what exists, so the first release
 notes can be assembled from them.
 
+## Unreleased — topbar constraint removed
+
+### Changed
+- `.ui-topbar` renders **wherever the host places it** — the kit no longer
+  hides it above the 760px breakpoint. Base styles (sticky, translucent, blur)
+  are always-on; visibility per breakpoint is the host's decision, made at
+  app level (`@media (min-width: 761px) { .ui-topbar { display: none; } }` in
+  the showcase). Rationale: with the integrated-titlebar and backdrop paths,
+  the topbar is the natural brand/drag surface on desktop too — a component
+  that ignores its own markup on half the viewports was a constraint, not a
+  behaviour. The showcase's `desktopTopbarHidden` assertion now verifies the
+  showcase's app-level choice.
+
 ## Unreleased — backdrop contract v2
 
 ### Changed

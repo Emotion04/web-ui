@@ -479,9 +479,9 @@ async function probeInPage() {
   await showPage('foundations');
 
   /* ── shell breakpoints ───────────────────────────────────────────────── */
-  // .ui-topbar is a third child of the two-column shell grid; if it ever renders
-  // at desktop width it becomes a grid item and pushes .ui-main to a new row.
-  // Asserted at the desktop viewport the probe runs in.
+  // The showcase hides .ui-topbar at desktop width at app level: as a grid
+  // child it would otherwise push .ui-main to a new row. This asserts the
+  // showcase's own choice and the grid stays two-column.
   results.desktopTopbarHidden = getComputedStyle(document.querySelector('.ui-topbar')).display === 'none';
   results.desktopNoHorizontalOverflow = document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1;
 

@@ -16,6 +16,10 @@
     .showcase-swatch { display: flex; align-items: center; gap: 10px; }
     .showcase-swatch i { display: block; width: 28px; height: 28px; border: 1px solid var(--ui-line); border-radius: 7px; background: var(--swatch); }
     .showcase-status { min-height: 22px; color: var(--ui-fg-muted); font-size: 12px; }
+    /* The kit renders .ui-topbar wherever the host places it; visibility per
+       breakpoint is the host's call. This showcase's desktop look has no
+       topbar — the sidebar brand carries it — so hide it above the breakpoint. */
+    @media (min-width: 761px) { .ui-topbar { display: none; } }
   </style>
 </head>
 <body>
