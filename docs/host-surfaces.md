@@ -154,6 +154,15 @@ the composition attribute but lags while dragging; macOS materials (vibrancy)
 come from the host framework per window; no standard equivalent exists on
 Linux — do not set `data-ui-backdrop` there and the kit stays opaque.
 
+Material choice is a host preference, one value in the window-effects config:
+`Mica` follows the theme and is the quiet default (in light mode it is
+deliberately almost invisible — subtle does not mean missing); `Mica Alt`
+(`tabbed`) carries more contrast between chrome and content; `Acrylic` is the
+most visible and also available on Windows 10, at the cost of GPU time and a
+history of drag lag. Light Mica over white cards is nearly undetectable by
+design — judge a material by its dark mode first, and by whether the window
+tone shifts when the wallpaper changes, not by how strongly it shows.
+
 ## Frameless main window (opt-in)
 
 Only for applications that must draw their own window controls — the seamless
