@@ -4,3 +4,12 @@ test-results/
 apps/showcase/.cache/
 .DS_Store
 debug.log
+
+# Local agent/tooling state — never enters the public repository
+.zcode/
+AGENTS.md
+AGENTS.local.md
+CLAUDE.md
+GEMINI.md
+.claude/
+.codex/
