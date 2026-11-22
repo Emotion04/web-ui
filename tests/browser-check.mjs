@@ -556,24 +556,25 @@ async function probeInPage() {
 
   /* ── window backdrop contract ────────────────────────────────────────────
      When the host paints the window material it sets data-ui-backdrop; the
-     page background must clear so the material shows through, the shell chrome
-     must become translucent, and content cards must stay opaque — text on
-     cards keeps its contrast contract regardless of the desktop behind. */
+     page background must clear, the chrome must go fully transparent (a heavy
+     tint reads as a separate colour block over the material), a faint
+     separator takes over as the shell/content boundary, and content cards
+     must stay opaque — text on cards keeps its contrast contract regardless
+     of the desktop behind. */
   results.backdropClearsPageBackground = (() => {
     const root = document.documentElement;
     const body = document.body;
     const card = document.querySelector('.ui-card');
+    const sidebar = document.querySelector('.ui-sidebar');
     const before = getComputedStyle(body).backgroundColor;
     root.setAttribute('data-ui-backdrop', 'mica');
     const cleared = getComputedStyle(body).backgroundColor === 'rgba(0, 0, 0, 0)';
-    // Chrome computes color-mix() to color(srgb …), not rgba(); both carry an
-    // alpha channel, opaque colors are plain rgb(…).
-    const sidebarBg = getComputedStyle(document.querySelector('.ui-sidebar')).backgroundColor;
-    const chromeTinted = sidebarBg.startsWith('color(') || sidebarBg.includes('rgba');
+    const chromeTransparent = getComputedStyle(sidebar).backgroundColor === 'rgba(0, 0, 0, 0)';
+    const separatorPresent = parseFloat(getComputedStyle(sidebar).borderInlineEndWidth) > 0;
     const cardOpaque = getComputedStyle(card).backgroundColor.startsWith('rgb(') && !getComputedStyle(card).backgroundColor.includes('rgba');
     root.removeAttribute('data-ui-backdrop');
     const restored = getComputedStyle(body).backgroundColor === before;
-    return cleared && chromeTinted && cardOpaque && restored;
+    return cleared && chromeTransparent && separatorPresent && cardOpaque && restored;
   })();
 
   /* ── performance contracts ───────────────────────────────────────────────

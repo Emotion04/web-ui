@@ -103,10 +103,21 @@ frameless.
    to `DWMWA_COLOR_NONE`, and `DWMWA_USE_IMMERSIVE_DARK_MODE` to match the
    theme: the caption and border go transparent while the system min/max/close
    buttons stay.
-2. Extend the webview across the caption region (Tauri v2:
-   `titleBarStyle: "Overlay"`; Electron: `titleBarOverlay`; Wails v3 does not
-   expose it yet — about twenty lines of `DwmSetWindowAttribute` on the window
-   handle after creation).
+2. Extend the webview across the caption region — **stack support varies, and
+   this is the step that fails silently**:
+   - Electron: `titleBarStyle: "hidden"` + `titleBarOverlay` — full support,
+     the webview covers the caption region (VS Code works this way).
+   - Tauri on macOS: `titleBarStyle: "Overlay"` works.
+   - **Tauri on Windows: `titleBarStyle: "Overlay"` is silently ignored** —
+     tao ≤ 0.37 implements it for macOS only (verified against the source).
+     On Windows use caption-colour matching instead: in setup, call
+     `DwmSetWindowAttribute` on `window.hwnd()` with `DWMWA_CAPTION_COLOR` and
+     `DWMWA_BORDER_COLOR` set to the app background's exact value (opaque
+     themes) or `DWMWA_COLOR_NONE` (material mode) — five lines, and keep the
+     `transparent: true` + `windowEffects` config. The webview then starts
+     below the caption but the caption matches it, and the backdrop contract's
+     transparent chrome removes the remaining seam.
+   - Wails v3: not exposed — about twenty lines of `DwmSetWindowAttribute`.
 3. Give the topbar right-hand padding for the system buttons' hit area, and
    keep interactive controls out of it.
 4. The kit's part: set `data-ui-backdrop` on :root when a window material is

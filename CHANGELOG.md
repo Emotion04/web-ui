@@ -3,6 +3,27 @@
 Not published to npm yet. Entries describe what exists, so the first release
 notes can be assembled from them.
 
+## Unreleased — backdrop contract v2
+
+### Changed
+- Under `data-ui-backdrop`, chrome surfaces (sidebar/topbar) are now **fully
+  transparent** instead of carrying a 65% surface tint, with a faint
+  `--ui-line` separator marking the shell/content boundary. Rationale from the
+  first real consumer: a heavy chrome tint over the material reads as a
+  separate colour block — the two-tone look materials are supposed to remove
+  (Windows 11 Settings keeps one material and lets opaque cards carry the
+  hierarchy).
+
+### Fixed
+- `docs/host-surfaces.md` no longer sends Tauri Windows hosts down a broken
+  path: `titleBarStyle: "Overlay"` is macOS-only in tao ≤ 0.37 (silently
+  ignored on Windows — verified against the source and in a real app). The
+  Windows Tauri recipe is now caption-colour matching via
+  `DwmSetWindowAttribute` on `window.hwnd()`; Electron and Tauri macOS keep
+  the extension route. The frameless checklist (opt-in) documents that tao
+  keeps `WS_MINIMIZEBOX | WS_MAXIMIZEBOX` on frameless windows, so the taskbar
+  toggle survives `decorations: false`.
+
 ## Unreleased — window backdrop contract
 
 ### Added

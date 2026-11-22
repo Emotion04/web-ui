@@ -451,14 +451,17 @@ html, body { overscroll-behavior: none; }
 /* ---- window backdrop mode ------------------------------------------------
    When the host paints the window backdrop itself — Windows 11 Mica/Acrylic
    via DWM, or any other window material — it sets data-ui-backdrop on :root.
-   The kit then steps out of the way: the page background clears so the
-   material shows through, and the shell chrome becomes a translucent tint of
-   its own surface. Content cards stay opaque: text on cards keeps its
-   contrast contract regardless of what the desktop happens to be. Chrome
-   surfaces are the readability seam; content is not. */
+   The kit then steps out of the way: nothing between the material and the eye
+   except content. Chrome surfaces (sidebar, topbar) go fully transparent — a
+   heavy tint here reads as a separate colour block over the material, which is
+   exactly the two-tone look materials are supposed to remove; navigation
+   affordance comes from hover/selection pills instead. Content cards stay
+   opaque: text on cards keeps its contrast contract regardless of what the
+   desktop happens to be. The faint separator replaces the chrome tint as the
+   shell/content boundary. */
 :root[data-ui-backdrop] { background: transparent; --ui-bg: transparent; }
-:root[data-ui-backdrop] .ui-sidebar { background: color-mix(in srgb, var(--ui-surface) 65%, transparent); }
-:root[data-ui-backdrop] .ui-topbar { background: color-mix(in srgb, var(--ui-bg) 55%, transparent); backdrop-filter: blur(14px); }
+:root[data-ui-backdrop] .ui-sidebar { background: transparent; border-inline-end: 1px solid color-mix(in srgb, var(--ui-line) 55%, transparent); }
+:root[data-ui-backdrop] .ui-topbar { background: transparent; border-block-end: 1px solid color-mix(in srgb, var(--ui-line) 55%, transparent); backdrop-filter: blur(14px); }
 
 /* ---- panel --------------------------------------------------------------
    The compact surface a menu-bar / tray icon opens: content-sized, no title
