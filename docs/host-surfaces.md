@@ -139,9 +139,20 @@ the frameless checklist do not apply to them.
 | System material (Mica / Acrylic) | `DWMWA_SYSTEMBACKDROP_TYPE`, transparent webview background, `data-ui-backdrop` on :root | the `[data-ui-backdrop]` rules in `index.css` clear the page background and tint the chrome |
 | Application-tuned translucency | transparent window + host blur-behind | the same attribute; override the two chrome tints to taste |
 
+**The material tone is a property of the effective theme.** Dark theme → dark
+material, light theme → light material; "跟随系统" follows the OS for both.
+When the application pins a theme (user picks light while the system is dark),
+the host must sync the material at the same moment — Tauri:
+`WebviewWindow::set_theme` (drives `DWMWA_USE_IMMERSIVE_DARK_MODE`); Electron:
+`nativeTheme.themeSource`; Win32: `DWMWA_USE_IMMERSIVE_DARK_MODE`. A pinned
+light theme over a dark material puts dark-theme text on dark material — every
+chrome word becomes ghost text (this defect shipped once; do not ship it
+again).
+
 Support matrix: Mica is Windows 11 only; Acrylic works on Windows 10 through
-the composition attribute but lags while dragging; no standard equivalent
-exists on Linux — do not set `data-ui-backdrop` there and the kit stays opaque.
+the composition attribute but lags while dragging; macOS materials (vibrancy)
+come from the host framework per window; no standard equivalent exists on
+Linux — do not set `data-ui-backdrop` there and the kit stays opaque.
 
 ## Frameless main window (opt-in)
 
