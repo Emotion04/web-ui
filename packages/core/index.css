@@ -75,7 +75,12 @@ html, body { overscroll-behavior: none; }
 .ui-topbar { display: none; }
 .ui-sidebar { display: flex; flex-direction: column; gap: var(--ui-space-5); padding: var(--ui-space-8) var(--ui-space-6); border-right: 1px solid var(--ui-line); background: var(--ui-surface); }
 .ui-sidebar__brand { padding: var(--ui-space-4) var(--ui-space-5) var(--ui-space-8); color: var(--ui-fg); font-weight: 700; letter-spacing: -.02em; }
-.ui-sidebar__nav { display: grid; gap: var(--ui-space-1); }
+.ui-sidebar__nav { position: relative; display: grid; gap: var(--ui-space-1); }
+/* When the host opts into a gliding highlight (bindThumb on the nav), the
+   thumb becomes the only selection shape in the list. :has() upgrades the
+   items without a second class to remember. */
+.ui-sidebar__nav:has(> .ui-thumb) .ui-nav-item[aria-current="page"] { background: transparent; color: var(--ui-fg); }
+.ui-sidebar__nav > .ui-thumb { background: var(--ui-surface-muted); background: color-mix(in srgb, var(--ui-fg) 6.5%, transparent); box-shadow: none; }
 .ui-sidebar__section { padding: var(--ui-space-7) var(--ui-space-5) var(--ui-space-2); color: var(--ui-fg-muted); font-size: var(--ui-text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
 .ui-nav-item { display: flex; align-items: center; gap: var(--ui-space-4); min-height: 36px; padding: 0 var(--ui-space-5); border: 0; border-radius: var(--ui-radius-sm); background: transparent; color: var(--ui-control-fg); text-align: left; cursor: pointer; transition: background-color var(--ui-duration-standard) var(--ui-ease-standard), color var(--ui-duration-standard) var(--ui-ease-standard), transform var(--ui-duration-press) var(--ui-ease-standard); }
 .ui-nav-item:hover { background: var(--ui-surface-muted); color: var(--ui-fg); }
@@ -151,7 +156,7 @@ html, body { overscroll-behavior: none; }
 .ui-switch[aria-checked="true"] { background: var(--ui-accent); }
 .ui-switch[aria-checked="true"]::after { transform: translateX(18px); }
 .ui-switch:disabled { cursor: not-allowed; opacity: .5; }
-.ui-popover { position: fixed; z-index: var(--ui-z-popover); min-width: 190px; max-width: min(360px, calc(100vw - 24px)); padding: var(--ui-space-3); border: 1px solid var(--ui-line); border-radius: var(--ui-radius-md); background: color-mix(in srgb, var(--ui-surface) 94%, transparent); box-shadow: var(--ui-shadow); backdrop-filter: blur(16px); animation: ui-pop-in var(--ui-duration-standard) var(--ui-ease-standard) both; }
+.ui-popover { position: fixed; z-index: var(--ui-z-popover); min-width: 190px; max-width: min(360px, calc(100vw - 24px)); padding: var(--ui-space-3); border: 1px solid var(--ui-line); border-radius: var(--ui-radius-md); background: var(--ui-surface); background: color-mix(in srgb, var(--ui-surface) 94%, transparent); box-shadow: var(--ui-shadow); backdrop-filter: blur(16px); animation: ui-pop-in var(--ui-duration-standard) var(--ui-ease-standard) both; }
 .ui-popover[hidden] { display: none; }
 .ui-menu-item { display: flex; width: 100%; min-height: 34px; align-items: center; border: 0; border-radius: var(--ui-radius-sm); background: transparent; color: var(--ui-fg-secondary); padding: 0 var(--ui-space-5); text-align: left; cursor: pointer; }
 .ui-menu-item:hover, .ui-menu-item[aria-checked="true"] { background: var(--ui-surface-muted); color: var(--ui-fg); }
@@ -200,7 +205,7 @@ html, body { overscroll-behavior: none; }
 .ui-tab[aria-selected="true"] { color: var(--ui-fg); font-weight: 550; }
 .ui-tabpanel { padding-top: var(--ui-space-8); }
 .ui-tabpanel[hidden] { display: none; }
-.ui-tabpanel:not([hidden]) { animation: ui-panel-in var(--ui-duration-panel) var(--ui-ease-standard) both; }
+.ui-tabpanel:not([hidden]) { animation: ui-panel-in var(--ui-duration-panel) var(--ui-ease-standard); }
 @keyframes ui-panel-in { from { opacity: 0; transform: translateY(var(--ui-motion-distance-sm)); } to { opacity: 1; transform: none; } }
 
 /* ---- disclosure --------------------------------------------------------- */
@@ -435,6 +440,25 @@ html, body { overscroll-behavior: none; }
    from scrolling instead of navigating. */
 .ui-view { display: block; }
 .ui-view[hidden] { display: none; }
+/* Top-level pages enter with the same fade-and-rise as tab panels; without it
+   a sidebar switch is an instant swap, which reads as a glitch rather than a
+   change of place. The `to` frame is explicit: an implicit one would leave a
+   filled identity transform on the view, which silently makes the view the
+   offsetParent of everything inside it and breaks offsetTop arithmetic. */
+.ui-view:not([hidden]) { animation: ui-view-in var(--ui-duration-panel) var(--ui-ease-standard); }
+@keyframes ui-view-in { from { opacity: 0; transform: translateY(var(--ui-motion-distance-sm)); } to { opacity: 1; transform: none; } }
+
+/* ---- window backdrop mode ------------------------------------------------
+   When the host paints the window backdrop itself — Windows 11 Mica/Acrylic
+   via DWM, or any other window material — it sets data-ui-backdrop on :root.
+   The kit then steps out of the way: the page background clears so the
+   material shows through, and the shell chrome becomes a translucent tint of
+   its own surface. Content cards stay opaque: text on cards keeps its
+   contrast contract regardless of what the desktop happens to be. Chrome
+   surfaces are the readability seam; content is not. */
+:root[data-ui-backdrop] { background: transparent; --ui-bg: transparent; }
+:root[data-ui-backdrop] .ui-sidebar { background: color-mix(in srgb, var(--ui-surface) 65%, transparent); }
+:root[data-ui-backdrop] .ui-topbar { background: color-mix(in srgb, var(--ui-bg) 55%, transparent); backdrop-filter: blur(14px); }
 
 /* ---- panel --------------------------------------------------------------
    The compact surface a menu-bar / tray icon opens: content-sized, no title
@@ -531,7 +555,10 @@ html, body { overscroll-behavior: none; }
   /* The sidebar disappears with the grid, so the topbar is the only navigation
      surface: it stays pinned while the page scrolls and opens the sidebar as a
      left sheet (see .ui-sheet[data-side="left"]). */
-  .ui-topbar { position: sticky; top: 0; z-index: var(--ui-z-sticky); display: flex; align-items: center; gap: var(--ui-space-5); padding: var(--ui-space-4) var(--ui-space-6); background: var(--ui-surface); border-bottom: 1px solid var(--ui-line); }
+  /* The compact topbar shares the page background — one surface, no divider —
+     and stays legible over scrolled content through translucency and blur.
+     The plain var(--ui-bg) first keeps engines without color-mix solid. */
+  .ui-topbar { position: sticky; top: 0; z-index: var(--ui-z-sticky); display: flex; align-items: center; gap: var(--ui-space-5); padding: var(--ui-space-4) var(--ui-space-6); background: var(--ui-bg); background: color-mix(in srgb, var(--ui-bg) 86%, transparent); backdrop-filter: blur(14px); }
   .ui-topbar__brand { color: var(--ui-fg); font-weight: 700; letter-spacing: -.02em; }
   .ui-main { padding: var(--ui-space-9) var(--ui-space-8); }
   .ui-page-header { align-items: start; flex-direction: column; }

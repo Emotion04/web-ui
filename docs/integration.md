@@ -128,6 +128,10 @@ topbar renders nothing, so this markup is inert above the breakpoint.
   console warning); `.ui-segmented` and `.ui-tabs` already do this.
 - `bindSheet` is the declarative counterpart of `openSheet`: trigger buttons
   open the same dialog repeatedly without stacking listeners.
+- **Sidebar page switches are transitions, not swaps.** Wrap the view change in
+  `startViewTransition(() => { … })` and let the sidebar highlight glide with
+  `bindThumb(nav).follow('[aria-current="page"]')`. An instant swap with a
+  static highlight is the defect, not the baseline — see `docs/motion.md`.
 - Every binder returns a disposer and every component emits a `ui-*` event; see
   `docs/components.md` for the full inventory.
 

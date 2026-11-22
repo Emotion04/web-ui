@@ -14,6 +14,7 @@ import {
   bindSlider,
   bindSwitch,
   bindTabs,
+  bindThumb,
   createToast,
   createToastStack,
   createTooltip,
@@ -21,6 +22,7 @@ import {
   openPopover,
   openSheet,
   setTheme,
+  startViewTransition,
 } from '/vanilla/index.js';
 
 const status = document.querySelector('#status');
@@ -53,19 +55,24 @@ const viewSections = [...document.querySelectorAll('.ui-view[data-view]')];
 
 function showView(name) {
   if (!VIEWS[name]) return;
-  navButtons.forEach(button => {
-    if (button.dataset.view === name) button.setAttribute('aria-current', 'page');
-    else button.removeAttribute('aria-current');
+  // The whole DOM swap runs inside one view transition: old page crossfades to
+  // the new one where the engine supports it, and the update still happens on
+  // engines without it. Without this the sidebar switch is an instant swap.
+  startViewTransition(() => {
+    navButtons.forEach(button => {
+      if (button.dataset.view === name) button.setAttribute('aria-current', 'page');
+      else button.removeAttribute('aria-current');
+    });
+    viewSections.forEach(section => { section.hidden = section.dataset.view !== name; });
+    // The secondary list belongs to one page only; it disappears with its parent.
+    const subnav = document.querySelector('#componentSubnav');
+    if (subnav) subnav.hidden = name !== 'components';
+    document.querySelector('#pageTitle').textContent = VIEWS[name].title;
+    document.querySelector('#pageSubtitle').textContent = VIEWS[name].subtitle;
+    // Navigating from the compact-shell drawer dismisses it: the page changed
+    // under the sheet, so leaving it open would hide the result.
+    if (navSheet?.open) navSheet.close();
   });
-  viewSections.forEach(section => { section.hidden = section.dataset.view !== name; });
-  // The secondary list belongs to one page only; it disappears with its parent.
-  const subnav = document.querySelector('#componentSubnav');
-  if (subnav) subnav.hidden = name !== 'components';
-  document.querySelector('#pageTitle').textContent = VIEWS[name].title;
-  document.querySelector('#pageSubtitle').textContent = VIEWS[name].subtitle;
-  // Navigating from the compact-shell drawer dismisses it: the page changed
-  // under the sheet, so leaving it open would hide the result.
-  if (navSheet?.open) navSheet.close();
   window.scrollTo(0, 0);
   say(`${VIEWS[name].title} page.`);
 }
@@ -74,6 +81,11 @@ navButtons.forEach(button => {
   if (!button.dataset.view) return;
   button.addEventListener('click', () => showView(button.dataset.view));
 });
+
+// The sidebar highlight is a single pill that glides to the selected page —
+// the same "place still, glide on change" contract the thumb uses everywhere
+// else. The :has() rule in index.css moves the selection colour onto the pill.
+bindThumb(document.querySelector('#sideNav')).follow('[aria-current="page"]');
 
 /* component sub-tabs ------------------------------------------------------
  * Inside the Components page a tablist switches sub-pages. This is the layer

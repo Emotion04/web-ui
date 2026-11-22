@@ -90,12 +90,69 @@ surface. About fifteen lines per platform, and it tracks the OS.
 Keeping these out is what lets the same markup run in a plain browser, which is
 also what makes the showcase and the browser check possible.
 
-## Frameless main window
+## Integrated titlebar (recommended)
 
-1. Reserve a drag strip at the top of the shell and mark it with host-specific
-   attributes in *your* CSS, not in the core.
-2. Draw window controls with `.ui-icon-button`, at least 44×44 on touch.
-3. Keep padding for the title area so content never slides under the controls.
+The default host path for the main window. A normal window with the caption
+blended into the client area keeps every native behaviour — taskbar toggle,
+Aero snap, resize borders, drag, the Win11 Snap Layouts flyout, accessibility
+— with zero host risk. This is what the Windows 11 system applications do, and
+empirically what ZCode does; it is why they look seamless without being
+frameless.
+
+1. Keep the native frame. Set `DWMWA_CAPTION_COLOR` and `DWMWA_BORDER_COLOR`
+   to `DWMWA_COLOR_NONE`, and `DWMWA_USE_IMMERSIVE_DARK_MODE` to match the
+   theme: the caption and border go transparent while the system min/max/close
+   buttons stay.
+2. Extend the webview across the caption region (Tauri v2:
+   `titleBarStyle: "Overlay"`; Electron: `titleBarOverlay`; Wails v3 does not
+   expose it yet — about twenty lines of `DwmSetWindowAttribute` on the window
+   handle after creation).
+3. Give the topbar right-hand padding for the system buttons' hit area, and
+   keep interactive controls out of it.
+4. The kit's part: set `data-ui-backdrop` on :root when a window material is
+   active — see the next section.
+
+The one thing this path cannot do is redraw the window controls themselves.
+When the application must own min/max/close, use the frameless path at the end
+of this file.
+
+Overlay and flyout windows (tray panels, OSDs) are frameless by nature
+regardless of this choice; if they are not in the taskbar, the toggle bits in
+the frameless checklist do not apply to them.
+
+## Window backdrop modes
+
+| Mode | Host | Kit |
+|---|---|---|
+| Opaque (default) | nothing | nothing |
+| System material (Mica / Acrylic) | `DWMWA_SYSTEMBACKDROP_TYPE`, transparent webview background, `data-ui-backdrop` on :root | the `[data-ui-backdrop]` rules in `index.css` clear the page background and tint the chrome |
+| Application-tuned translucency | transparent window + host blur-behind | the same attribute; override the two chrome tints to taste |
+
+Support matrix: Mica is Windows 11 only; Acrylic works on Windows 10 through
+the composition attribute but lags while dragging; no standard equivalent
+exists on Linux — do not set `data-ui-backdrop` there and the kit stays opaque.
+
+## Frameless main window (opt-in)
+
+Only for applications that must draw their own window controls — the seamless
+topbar alone is not a reason, the integrated titlebar delivers it. A frameless
+window is a `WS_POPUP`; without `WS_MINIMIZEBOX | WS_MAXIMIZEBOX` the taskbar
+button stops toggling the window — the classic click-does-nothing defect. The
+complete checklist:
+
+1. **Keep the interaction bits.** `WS_MINIMIZEBOX | WS_MAXIMIZEBOX` for the
+   taskbar toggle, `WS_THICKFRAME` for resize borders and Aero snap. Verify
+   after creation with `GetWindowLong` — some frameworks strip these bits in
+   frameless mode without telling you.
+2. **Drag strip.** Reserve the top of the shell and mark it with the
+   host-specific attribute in *your* CSS, not in the core
+   (`--wails-draggable`, `data-tauri-drag-region`, `-webkit-app-region`).
+   Mark the controls `no-drag`, or buttons will move the window.
+3. **Window controls.** Draw them with `.ui-icon-button`, at least 44×44 on
+   touch, with right-hand padding so content never slides under them.
+   Optional: handle `WM_NCHITTEST → HTMAXBUTTON` over the maximize button to
+   restore the Windows 11 Snap Layouts flyout.
+4. **Backdrop.** Pair with the `data-ui-backdrop` contract above.
 
 Everything else — panels, menus, sheets, dialogs — is the same markup as the web
 build.

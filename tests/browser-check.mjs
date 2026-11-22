@@ -485,6 +485,40 @@ async function probeInPage() {
   results.desktopTopbarHidden = getComputedStyle(document.querySelector('.ui-topbar')).display === 'none';
   results.desktopNoHorizontalOverflow = document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1;
 
+  /* ── interaction polish ──────────────────────────────────────────────── */
+  // A top-level page must enter with the fade-and-rise, not as an instant swap.
+  results.viewHasEnterAnimation = (() => {
+    const view = [...document.querySelectorAll('.ui-view')].find(v => !v.hidden);
+    return view ? getComputedStyle(view).animationName === 'ui-view-in' : false;
+  })();
+  // The sidebar highlight must be a gliding pill, not a per-item repaint:
+  // the thumb exists in the nav and moves when the selection moves.
+  {
+    const nav = document.querySelector('#sideNav');
+    const thumb = nav?.querySelector(':scope > .ui-thumb');
+    results.navThumbExists = thumb !== null;
+    if (thumb) {
+      const topAt = () => Math.round(thumb.getBoundingClientRect().top);
+      // Land on a known row and wait out any glide still in flight from the
+      // navigation above — otherwise `before` is a mid-flight value and the
+      // comparison is a coin toss.
+      document.querySelector('#sideNav [data-view="foundations"]').click();
+      await wait(340);
+      const before = topAt();
+      document.querySelector('#sideNav [data-view="components"]').click();
+      await wait(340);
+      const after = topAt();
+      results.navThumbGlides = after !== before && thumb.getBoundingClientRect().height > 0;
+      // The :has() upgrade hands the selection colour to the pill.
+      results.navThumbOwnsSelection = (() => {
+        const current = nav.querySelector('[aria-current="page"]');
+        return current && getComputedStyle(current).backgroundColor === 'rgba(0, 0, 0, 0)';
+      })();
+      document.querySelector('#sideNav [data-view="foundations"]').click();
+      await wait(340);
+    }
+  }
+
   /* ── defensive contracts ─────────────────────────────────────────────── */
   // bindThumb: a static control must gain a positioning context, or the thumb
   // anchors to some ancestor and lands nowhere useful. The host starts as a
@@ -503,6 +537,7 @@ async function probeInPage() {
 
   // A fixed tooltip cannot follow its anchor through a scroll; it must leave
   // instead of floating over unrelated content.
+
   {
     const target = document.createElement('button');
     target.textContent = 'tooltip probe';
@@ -518,6 +553,28 @@ async function probeInPage() {
     dispose();
     target.remove();
   }
+
+  /* ── window backdrop contract ────────────────────────────────────────────
+     When the host paints the window material it sets data-ui-backdrop; the
+     page background must clear so the material shows through, the shell chrome
+     must become translucent, and content cards must stay opaque — text on
+     cards keeps its contrast contract regardless of the desktop behind. */
+  results.backdropClearsPageBackground = (() => {
+    const root = document.documentElement;
+    const body = document.body;
+    const card = document.querySelector('.ui-card');
+    const before = getComputedStyle(body).backgroundColor;
+    root.setAttribute('data-ui-backdrop', 'mica');
+    const cleared = getComputedStyle(body).backgroundColor === 'rgba(0, 0, 0, 0)';
+    // Chrome computes color-mix() to color(srgb …), not rgba(); both carry an
+    // alpha channel, opaque colors are plain rgb(…).
+    const sidebarBg = getComputedStyle(document.querySelector('.ui-sidebar')).backgroundColor;
+    const chromeTinted = sidebarBg.startsWith('color(') || sidebarBg.includes('rgba');
+    const cardOpaque = getComputedStyle(card).backgroundColor.startsWith('rgb(') && !getComputedStyle(card).backgroundColor.includes('rgba');
+    root.removeAttribute('data-ui-backdrop');
+    const restored = getComputedStyle(body).backgroundColor === before;
+    return cleared && chromeTinted && cardOpaque && restored;
+  })();
 
   /* ── performance contracts ───────────────────────────────────────────────
      Each of these was a measured cost, not a guess. They are cheap to assert
@@ -809,14 +866,17 @@ try {
   results.dragSortClearsStateAfterDrop = dragEnd.leftoverMarks === 0 && dragEnd.leftoverDragging === 0;
 
   // Screenshots must start from a known state: the probe leaves dialogs,
-  // toasts and a scrolled viewport behind, and a baseline that drifts between
-  // runs is worse than no baseline. Reset first, then capture.
+  // toasts, a scrolled viewport and a stray hover behind, and a baseline that
+  // drifts between runs is worse than no baseline. Reset first, then capture.
   await evaluate(`(() => {
     document.querySelectorAll('dialog[open]').forEach(dialog => dialog.close());
     document.querySelectorAll('.ui-toast').forEach(node => node.remove());
     document.querySelector('#sideNav [data-view="foundations"]').click();
     window.scrollTo(0, 0);
   })()`);
+  // The real-pointer drag tests leave the mouse somewhere on the page; park it
+  // in the corner so no row is hovered when a baseline is captured.
+  await cdp.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 0, y: 0, button: 'none', buttons: 0 });;
   await sleep(150);
 
   await evaluate(`document.documentElement.dataset.uiTheme = 'light'`);
@@ -830,7 +890,7 @@ try {
 
   // Components page with a sub-tab open, which is the densest screen.
   await evaluate(`document.querySelector('#sideNav [data-view="components"]').click()`);
-  await sleep(120);
+  await sleep(280); // the view entrance runs 220ms; wait it out
   await shoot('showcase-components');
   await evaluate(`document.querySelector('#ctab-controls').click()`);
   await sleep(140);
@@ -847,11 +907,11 @@ try {
   const overlays = await shoot('showcase-overlays');
 
   await evaluate(`document.querySelector('#sideNav [data-view="panel"]').click()`);
-  await sleep(140);
+  await sleep(280);
   const panelShot = await shoot('showcase-panel');
 
   await evaluate(`document.querySelector('#sideNav [data-view="states"]').click()`);
-  await sleep(140);
+  await sleep(280);
   const statesShot = await shoot('showcase-states');
   await evaluate(`document.querySelector('#sideNav [data-view="components"]').click()`);
   await sleep(120);
@@ -874,6 +934,7 @@ try {
   Object.assign(results, await drawerProbe(`(() => ({
     mobileTopbarVisible: getComputedStyle(document.querySelector('.ui-topbar')).display !== 'none',
     mobileSidebarHidden: getComputedStyle(document.querySelector('.ui-sidebar')).display === 'none',
+    mobileTopbarSeamless: getComputedStyle(document.querySelector('.ui-topbar')).borderBottomWidth === '0px',
     mobileNoHorizontalOverflow: document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1,
   }))()`));
   await evaluate(`document.querySelector('#navTrigger').click()`);
@@ -898,7 +959,7 @@ try {
   // The drawer test left the states page showing; restore the overlays page
   // the sheet baseline has always had behind it.
   await evaluate(`document.querySelector('#sideNav [data-view="components"]').click()`);
-  await sleep(120);
+  await sleep(280);
   await evaluate(`document.querySelector('#ctab-overlays').click()`);
   await sleep(120);
   await evaluate(`document.querySelector('#sheetButton').click()`);

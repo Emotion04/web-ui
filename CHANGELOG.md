@@ -3,6 +3,48 @@
 Not published to npm yet. Entries describe what exists, so the first release
 notes can be assembled from them.
 
+## Unreleased — window backdrop contract
+
+### Added
+- `data-ui-backdrop` on :root is the host↔kit contract for window materials
+  (Windows 11 Mica/Acrylic or any host-painted backdrop): the page background
+  clears so the material shows through, the shell chrome becomes a translucent
+  tint, and content cards stay opaque — the readability seam is between chrome
+  and content, not between the app and the desktop. `docs/host-surfaces.md`
+  now documents the integrated-titlebar pattern (transparent caption via DWM,
+  the route the Windows 11 system applications take) with the support matrix,
+  and keeps the frameless path as opt-in with its required style bits
+  (`WS_MINIMIZEBOX | WS_MAXIMIZEBOX`) spelled out.
+- The audit now scans the whole repository for the upstream product name and
+  the component layer for host-stack vocabulary, so publishing keeps both
+  clean by construction.
+
+## Unreleased — interaction polish
+
+### Added
+- Top-level pages enter with a fade-and-rise (`.ui-view:not([hidden])`, 220ms
+  panel duration), so a sidebar switch no longer reads as an instant swap. The
+  showcase wraps its page switch in `startViewTransition`, which the kit always
+  exported but never demonstrated.
+- The sidebar can carry a gliding highlight:
+  `bindThumb(nav).follow('[aria-current="page"]')` moves one pill between rows;
+  when the thumb exists, a `:has()` rule hands the selection colour to the pill
+  so there is exactly one selection shape.
+
+### Changed
+- The compact topbar shares the page background instead of drawing a divider:
+  translucent `--ui-bg` plus `backdrop-filter` keeps it legible over scrolled
+  content without a hard line. `.ui-popover` gained a solid `background`
+  fallback ahead of its `color-mix`, so engines without `color-mix` render a
+  solid surface instead of a transparent one.
+
+### Fixed
+- Entrance animations kept `fill: both`, and a filled transform animation
+  leaves an identity matrix on computed style even when the last keyframe is
+  `transform: none` — the view silently became the `offsetParent` of its
+  contents and every `offsetTop` inside it was wrong after the first page
+  switch. Entrances no longer fill; the trap is inherent to filled transforms.
+
 ## Unreleased — palette
 
 ### Changed
